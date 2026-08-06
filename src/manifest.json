@@ -3,6 +3,7 @@
   "chromium:manifest_version": 3,
   "firefox:manifest_version": 2,
   "version": "1.0.0",
+  "version_name": "1.0.0",
   "firefox:browser_specific_settings": {
     "gecko": {
       "data_collection_permissions": {
@@ -13,7 +14,9 @@
     }
   },
   "name": "Chat Float",
-  "description": "Float live chat overlay on YouTube",
+  "short_name": "Chat Float",
+  "description": "Float YouTube live chat messages over videos as a customizable danmaku overlay.",
+  "homepage_url": "https://github.com/phamhuulocforwork/chat-float",
   "icons": {
     "16": "images/icon.png",
     "32": "images/icon.png",
@@ -45,11 +48,11 @@
   },
   "chromium:side_panel": {
     "default_path": "sidebar/index.html",
-    "default_title": "Side Panel Content"
+    "default_title": "Chat Float"
   },
   "firefox:sidebar_action": {
     "default_panel": "sidebar/index.html",
-    "default_title": "Side Panel Content"
+    "default_title": "Chat Float"
   },
   "chromium:permissions": [
     "storage",
