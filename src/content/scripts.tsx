@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client'
+import { whenDocumentReady } from './domReady'
 import { hideYouTubeSidebar } from './hideYouTubeSidebar'
 import OverlayApp from './overlay/OverlayApp'
 import { initLiveChatBridge } from './overlay/chatScraper'
@@ -56,13 +57,20 @@ function mountOverlay() {
   }
 }
 
+function isWatchPage() {
+  return (
+    location.pathname.includes('/watch') || location.pathname.includes('/live')
+  )
+}
+
 function initWatchPage() {
-  const cleanupSidebar = hideYouTubeSidebar()
-  const cleanupWindowed = initWindowedFullscreen()
-  const cleanupPlayerControls = initPlayerControls()
+  let cleanupSidebar: (() => void) | null = null
+  let cleanupWindowed: (() => void) | null = null
+  let cleanupPlayerControls: (() => void) | null = null
   let cleanupOverlay: (() => void) | null = null
   let observer: MutationObserver | null = null
   let mountPoll: ReturnType<typeof setInterval> | null = null
+  let modulesStarted = false
 
   const tryMount = () => {
     if (cleanupOverlay) return true
@@ -70,7 +78,8 @@ function initWatchPage() {
     return !!cleanupOverlay
   }
 
-  if (!tryMount()) {
+  const startMountPolling = () => {
+    if (mountPoll || cleanupOverlay) return
     mountPoll = setInterval(() => {
       if (tryMount()) {
         clearInterval(mountPoll!)
@@ -79,16 +88,40 @@ function initWatchPage() {
     }, 500)
   }
 
-  observer = new MutationObserver(() => {
-    const player = findPlayer()
-    if (player && !player.querySelector('[data-extension-root="true"]')) {
-      cleanupOverlay?.()
-      cleanupOverlay = null
-      tryMount()
-    }
-  })
+  const attachPlayerObserver = () => {
+    if (observer) return
 
-  observer.observe(document.body, { childList: true, subtree: true })
+    observer = new MutationObserver(() => {
+      const player = findPlayer()
+      if (player && !player.querySelector('[data-extension-root="true"]')) {
+        cleanupOverlay?.()
+        cleanupOverlay = null
+        tryMount()
+        if (!cleanupOverlay) startMountPolling()
+      }
+    })
+
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+    })
+  }
+
+  const startWatchModules = () => {
+    if (modulesStarted) return
+    modulesStarted = true
+    cleanupSidebar = hideYouTubeSidebar()
+    cleanupWindowed = initWindowedFullscreen()
+    cleanupPlayerControls = initPlayerControls()
+    if (!tryMount()) startMountPolling()
+    attachPlayerObserver()
+  }
+
+  const startWhenBodyReady = () => {
+    whenDocumentReady(startWatchModules)
+  }
+
+  startWhenBodyReady()
 
   return () => {
     cleanupOverlay?.()
@@ -97,13 +130,34 @@ function initWatchPage() {
     cleanupPlayerControls?.()
     observer?.disconnect()
     if (mountPoll) clearInterval(mountPoll)
+    modulesStarted = false
   }
 }
 
-function isWatchPage() {
-  return (
-    location.pathname.includes('/watch') || location.pathname.includes('/live')
-  )
+function initTopFrameSpa() {
+  let cleanupWatch: (() => void) | null = null
+
+  const syncPage = () => {
+    if (isWatchPage()) {
+      if (!cleanupWatch) cleanupWatch = initWatchPage()
+    } else if (cleanupWatch) {
+      cleanupWatch()
+      cleanupWatch = null
+    }
+  }
+
+  syncPage()
+
+  const onNavigate = () => syncPage()
+  window.addEventListener('yt-navigate-finish', onNavigate)
+  window.addEventListener('yt-page-data-updated', onNavigate)
+
+  return () => {
+    window.removeEventListener('yt-navigate-finish', onNavigate)
+    window.removeEventListener('yt-page-data-updated', onNavigate)
+    cleanupWatch?.()
+    cleanupWatch = null
+  }
 }
 
 /**
@@ -113,8 +167,14 @@ function isWatchPage() {
 export default function initial() {
   if (location.pathname.startsWith('/live_chat')) {
     // yt-live-chat-app lives in this iframe document — apply hide CSS here too
-    const cleanupHide = hideYouTubeSidebar()
-    const cleanupBridge = initLiveChatBridge()
+    let cleanupHide: (() => void) | null = null
+    let cleanupBridge: (() => void) | null = null
+
+    whenDocumentReady(() => {
+      cleanupHide = hideYouTubeSidebar()
+      cleanupBridge = initLiveChatBridge()
+    })
+
     return () => {
       cleanupBridge?.()
       cleanupHide?.()
@@ -125,9 +185,5 @@ export default function initial() {
     return () => {}
   }
 
-  if (isWatchPage()) {
-    return initWatchPage()
-  }
-
-  return () => {}
+  return initTopFrameSpa()
 }

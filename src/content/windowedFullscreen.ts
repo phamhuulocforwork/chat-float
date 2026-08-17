@@ -1,3 +1,5 @@
+import { appendToHead } from './domReady'
+
 const WINDOWED_CLASS = 'cf-windowed-fs'
 const WINDOWED_PARAM = 'cf_windowed'
 const STYLE_ID = 'chat-float-windowed-fs-styles'
@@ -160,7 +162,7 @@ function injectStyles(): void {
   if (!style) {
     style = document.createElement('style')
     style.id = STYLE_ID
-    document.head.appendChild(style)
+    appendToHead(style)
   }
   // Always refresh — HMR / old builds may leave sticky-chat rules in place.
   style.textContent = WINDOWED_CSS

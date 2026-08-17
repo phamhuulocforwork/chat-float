@@ -14,6 +14,7 @@ Chat Float is a browser extension that floats YouTube live chat over the video a
 - Open windowed fullscreen in the current tab or a popup window
 - Skip historical chat backlog when opening a live page or returning from a hidden tab
 - Support Chrome, Firefox, and Edge builds
+- Works on first navigation to a video — no tab reload needed when opening a watch/live page from the YouTube homepage, search, or other in-site links (SPA navigation)
 
 ## Requirements
 
@@ -74,6 +75,10 @@ Open the extension popup to configure:
 5. **Hide panels / full-bleed** — hide native chat panels for a wider video view
 6. **Windowed fullscreen** — apply to this tab or open a dedicated popup
 
+## Troubleshooting
+
+After updating the extension, reload it once at `chrome://extensions/` (or your browser’s add-ons page), then refresh any open YouTube tabs so the new content script is active.
+
 ## Project Structure
 
 ```text
@@ -94,5 +99,6 @@ src/
 ## Notes for Maintainers
 
 - Keep `package.json` and `src/manifest.json` version fields in sync before releasing
+- Update [`CHANGE_LOGS.md`](CHANGE_LOGS.md) for each release
 - Run `npm run release` to build Chrome, Firefox, and Edge archives under `dist/release/`
 - Replace preview assets and store listing content before submitting to browser stores

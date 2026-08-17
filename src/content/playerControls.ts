@@ -3,6 +3,7 @@ import {
   updateWfsButtonState,
   WFS_BUTTON_ID,
 } from './windowedFullscreen'
+import { appendToHead } from './domReady'
 
 const CHAT_BUTTON_ID = 'cf-chat-button'
 const HIDE_CHAT_CLASS = 'cf-hide-native-chat'
@@ -78,7 +79,7 @@ function injectHideChatStyles(): void {
   const style = document.createElement('style')
   style.id = HIDE_CHAT_STYLE_ID
   style.textContent = HIDE_CHAT_CSS
-  document.head.appendChild(style)
+  appendToHead(style)
 }
 
 function setCollapsedInline(el: Element | null, collapsed: boolean): void {

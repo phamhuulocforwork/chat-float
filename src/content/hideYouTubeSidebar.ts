@@ -3,6 +3,7 @@ import {
   STORAGE_KEY,
   type OverlaySettings,
 } from './overlay/useChromeStorage'
+import { appendToHead } from './domReady'
 
 const STYLE_ID = 'chat-float-hide-native-sidebar'
 
@@ -45,7 +46,7 @@ function applyHideStyles(settings: Partial<OverlaySettings>) {
   if (!style) {
     style = document.createElement('style')
     style.id = STYLE_ID
-    document.head.appendChild(style)
+    appendToHead(style)
   }
 
   style.textContent = css

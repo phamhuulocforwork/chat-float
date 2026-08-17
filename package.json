@@ -2,7 +2,7 @@
   "private": true,
   "name": "chat-float",
   "description": "Float YouTube live chat messages over videos as a customizable danmaku overlay.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/phamhuulocforwork/chat-float#readme",
   "repository": {
     "type": "git",

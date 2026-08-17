@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/chrome-manifest.json",
   "chromium:manifest_version": 3,
   "firefox:manifest_version": 2,
-  "version": "1.0.0",
-  "version_name": "1.0.0",
+  "version": "1.0.1",
+  "version_name": "1.0.1",
   "firefox:browser_specific_settings": {
     "gecko": {
       "data_collection_permissions": {
@@ -72,13 +72,12 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*.youtube.com/watch*",
-        "*://*.youtube.com/live*",
-        "*://*.youtube.com/live_chat*"
+        "*://*.youtube.com/*"
       ],
       "js": [
         "content/scripts.tsx"
       ],
+      "run_at": "document_start",
       "all_frames": true
     }
   ]
