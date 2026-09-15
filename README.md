@@ -6,6 +6,8 @@ Chat Float is a browser extension that floats YouTube live chat over the video a
 
 ## Features
 
+- Block pop-ups and new tabs opened via `window.open`, `target="_blank"` links, or form submissions, with a toast to allow or dismiss each attempt
+- Blacklist mode: by default every site is protected, or restrict blocking to the sites you list (regular expressions supported)
 - Float live chat messages over YouTube watch and live videos
 - Toggle the overlay on or off from the popup
 - Adjust animation speed (fast / normal / slow)
@@ -69,11 +71,13 @@ npm run release
 Open the extension popup to configure:
 
 1. **Show overlay** — enable or disable the danmaku overlay
-2. **Speed** — choose fast, normal, or slow animation
-3. **Opacity** — adjust overlay transparency
-4. **Text color** — pick the chat text color
-5. **Hide panels / full-bleed** — hide native chat panels for a wider video view
-6. **Windowed fullscreen** — apply to this tab or open a dedicated popup
+2. **Block popup** — block pop-ups and new tabs across every site; requires the optional *all sites* permission
+3. **Use blacklist** — sub-option of Block popup: restrict blocking to the hostnames in your list (regex supported, one pattern per line)
+4. **Speed** — choose fast, normal, or slow animation
+5. **Opacity** — adjust overlay transparency
+6. **Text color** — pick the chat text color
+7. **Hide panels / full-bleed** — hide native chat panels for a wider video view
+8. **Windowed fullscreen** — apply to this tab or open a dedicated popup
 
 ## Troubleshooting
 
@@ -87,6 +91,7 @@ src/
 ├── background.ts   # Service worker
 ├── content/        # Content scripts, overlay, player controls
 ├── components/     # Shared UI components
+├── popup-blocker/  # Pop-up blocker scripts, policy, and toast UI
 ├── sidebar/        # Side panel entry
 ├── hooks/          # Shared React hooks
 └── lib/            # Shared utilities
