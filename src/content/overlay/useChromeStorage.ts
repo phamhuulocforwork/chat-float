@@ -24,6 +24,9 @@ function normalizeSettings(
 
 export interface OverlaySettings {
   enabled: boolean
+  blockPopup: boolean
+  usePopupBlacklist: boolean
+  popupBlacklist: string
   opacity: number
   autoShow: boolean
   maxMessages: number
@@ -35,6 +38,9 @@ export interface OverlaySettings {
 
 export const DEFAULT_SETTINGS: OverlaySettings = {
   enabled: true,
+  blockPopup: false,
+  usePopupBlacklist: false,
+  popupBlacklist: '',
   opacity: 0.95,
   autoShow: true,
   maxMessages: 200,

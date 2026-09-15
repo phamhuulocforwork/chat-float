@@ -59,6 +59,25 @@ function openWindowedFullscreen(mode: 'this-tab' | 'popup') {
   }
 }
 
+async function setBlockPopup(
+  checked: boolean,
+  setSettings: (patch: { blockPopup: boolean }) => void
+) {
+  if (checked) {
+    try {
+      const granted = await chrome.permissions.request({
+        origins: ['<all_urls>'],
+      })
+      if (!granted) return
+    } catch (err) {
+      console.warn('[PopupApp] Failed to request host permission:', err)
+      return
+    }
+  }
+
+  setSettings({ blockPopup: checked })
+}
+
 export default function PopupApp() {
   const [settings, setSettings, loaded] = useChromeStorage()
 
@@ -119,6 +138,54 @@ export default function PopupApp() {
                 onCheckedChange={(checked) => setSettings({ enabled: checked })}
               />
             </div>
+
+            <div className="popup-field popup-field-row">
+              <Label htmlFor="blockPopup">Block popup</Label>
+              <Switch
+                id="blockPopup"
+                size="sm"
+                checked={settings.blockPopup}
+                onCheckedChange={(checked) =>
+                  void setBlockPopup(checked, setSettings)
+                }
+              />
+            </div>
+
+            {settings.blockPopup ? (
+              <div className="popup-field gap-3 border-l border-border/60 pl-3">
+                <div className="popup-field-row">
+                  <Label htmlFor="usePopupBlacklist">Use blacklist</Label>
+                  <Switch
+                    id="usePopupBlacklist"
+                    size="sm"
+                    checked={settings.usePopupBlacklist}
+                    onCheckedChange={(checked) =>
+                      setSettings({ usePopupBlacklist: checked })
+                    }
+                  />
+                </div>
+
+                {settings.usePopupBlacklist ? (
+                  <>
+                    <textarea
+                      id="popupBlacklist"
+                      rows={2}
+                      spellCheck={false}
+                      aria-label="Blacklist domains"
+                      placeholder={'webbrowsertools.com\n^ads\\.example\\.com\n^tracker\\..+$'}
+                      value={settings.popupBlacklist}
+                      onChange={(event) =>
+                        setSettings({ popupBlacklist: event.target.value })
+                      }
+                      className="block w-full resize-none overflow-y-auto rounded-md border border-input bg-background px-3 py-2 font-mono text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Popups and redirects opened by these domains are blocked.
+                    </p>
+                  </>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="popup-field popup-field-row">
               <Label htmlFor="animSpeed">Speed</Label>

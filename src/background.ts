@@ -1,3 +1,10 @@
+import {
+  handlePopupBlockerMessage,
+  initPopupBlocker,
+} from './popup-blocker/service'
+
+initPopupBlocker()
+
 const isFirefoxLike =
   import.meta.env.EXTENSION_PUBLIC_BROWSER === 'firefox' ||
   import.meta.env.EXTENSION_PUBLIC_BROWSER === 'gecko-based'
@@ -69,7 +76,11 @@ async function runWindowedFullscreen(
   await openWindowedFullscreenPopup(tab)
 }
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.cmd) {
+    return handlePopupBlockerMessage(message, sender, sendResponse)
+  }
+
   if (message?.type !== 'OPEN_WINDOWED_FS') return
 
   const mode: WindowedFsMode =

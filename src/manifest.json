@@ -1,11 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/chrome-manifest.json",
   "chromium:manifest_version": 3,
-  "firefox:manifest_version": 2,
-  "version": "1.0.1",
-  "version_name": "1.0.1",
+  "firefox:manifest_version": 3,
+  "version": "1.0.2",
+  "version_name": "1.0.2",
   "firefox:browser_specific_settings": {
     "gecko": {
+      "strict_min_version": "128.0",
       "data_collection_permissions": {
         "required": [
           "none"
@@ -57,11 +58,39 @@
   "chromium:permissions": [
     "storage",
     "sidePanel",
-    "tabs"
+    "tabs",
+    "scripting"
   ],
   "firefox:permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "scripting"
+  ],
+  "chromium:optional_host_permissions": [
+    "<all_urls>"
+  ],
+  "firefox:optional_host_permissions": [
+    "<all_urls>"
+  ],
+  "chromium:web_accessible_resources": [
+    {
+      "resources": [
+        "popup-blocker/inject/main.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "firefox:web_accessible_resources": [
+    {
+      "resources": [
+        "popup-blocker/inject/main.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
   ],
   "background": {
     "chromium:service_worker": "background.ts",
@@ -76,6 +105,19 @@
       ],
       "js": [
         "content/scripts.tsx"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "exclude_matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "popup-blocker/inject/isolated.tsx"
       ],
       "run_at": "document_start",
       "all_frames": true
